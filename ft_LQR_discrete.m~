@@ -1,0 +1,29 @@
+function ft_LQR_discrete()
+close all
+modelParams=setParams();
+%% linearizing dynamics at (pi,0)
+A=[0 1;modelParams.g/modelParams.length -modelParams.c/modelParams.m];
+B=[0 ;1];
+
+%% ricatti equations-backprop
+S=zeros(2,2,modelParams.N);
+K=zeros(modelParams.N,2);
+S(:,:,end)=modelParams.Qf;
+
+for i=modelParams.N-1:-1:1
+    K(i,:)=inv(modelParams.Rt+B'*S(:,:,i+1)*B)*B'*S(:,:,i+1)*A;
+    S(:,:,i)=modelParams.Qt+K(i,:)'*modelParams.Rt*K(i,:)+(A-B*K(i,:))'...
+        *S(:,:,i+1)*(A-B*K(i,:));
+end
+
+%% dynamics-forward propagation
+x=zeros(2,modelParams.N);
+x(:,1)=modelParams.x_init;
+u=zeros(modelParams.N,1);
+for dyn_iter=1:modelParams.N-1
+    u(dyn_iter)=-K(dyn_iter,:)*wrapToPi((x(:,dyn_iter)-[pi;0]));
+    xdot=A
+%     [~,x(:,dyn_iter+1)]=simplePendDynamics(x(:,dyn_iter),u(dyn_iter), modelParams);
+    x(:,dyn_iter+1)=wrapToPi(x(:,dyn_iter+1));
+end
+end
