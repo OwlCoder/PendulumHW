@@ -29,8 +29,7 @@ for dyn_iter=1:modelParams.N-1
     xdiff=[pi;0]-x(:,dyn_iter);
     u(dyn_iter)=K(dyn_iter,:)*xdiff;
     if abs(u(dyn_iter))>modelParams.u_lim
-        u(dyn_iter)=sign(u(dyn_iter))*modelParams.u_lim;
-    end
+        u(dyn_iter)=sign(u(lim))*modelPar
     x(:,dyn_iter+1)=x(:,dyn_iter)+A*xdiff +B*u(dyn_iter);
 end
 figure;
