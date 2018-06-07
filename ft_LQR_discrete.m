@@ -3,7 +3,7 @@ close all
 modelParams=setParams();
 %% linearizing dynamics at (pi,0)
 A=[0 1;modelParams.g/modelParams.length -modelParams.c/modelParams.m];
-B=[0 ;1];
+B=[0 ;1/(modelParams.m*modelParams.length^2)];
 M=[A B;zeros(1,3)]*modelParams.dt;
 M=expm(M);
 A=M(1:2,1:2);
@@ -32,18 +32,7 @@ for dyn_iter=1:modelParams.N-1
         u(dyn_iter)=sign(u(dyn_iter))*modelParams.u_lim;
     end
     x(:,dyn_iter+1)=x(:,dyn_iter)+A*xdiff +B*u(dyn_iter);
+%     x(:,dyn_iter+1)=A*x(:,dyn_iter) + B*u(dyn_iter);
 end
-figure;
-subplot(2,2,1)
-plot(x(1,:),x(2,:),'b','LineWidth',2);
-title('state-space')
-subplot(2,2,2)
-plot([1:1:modelParams.N],u,'r','LineWidth',2);
-title('control input');
-subplot(2,2,3)
-plot([1:1:modelParams.N],x(1,:),'b','LineWidth',2);
-title('Position')
-subplot(2,2,4)
-plot([1:1:modelParams.N],x(2,:),'b','LineWidth',2);
-title('velocity')
+plot_figs(x,u);
 end
